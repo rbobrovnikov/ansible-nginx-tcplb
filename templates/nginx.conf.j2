@@ -1,0 +1,24 @@
+user  {{ nginx_tcplb_user }};
+
+error_log  /var/log/nginx/error.log warn;
+pid        /var/run/nginx.pid;
+
+worker_processes {{ nginx_tcplb_worker_processes }};
+
+events {
+    worker_connections  {{ nginx_tcplb_worker_connections }};
+}
+
+stream {
+  upstream {{ nginx_tcplb_stream_group }} {
+{% for target_addr in nginx_tcplb_target_addr %}
+    server {{ target_addr }}:{{ nginx_tcplb_target_port }};
+{% endfor %}
+  }
+{% for listen_addr in nginx_tcplb_listen_addr %}
+  server {
+    listen {{ listen_addr }}:{{ nginx_tcplb_listen_port }};
+    proxy_pass {{ nginx_tcplb_stream_group }};
+  }
+{% endfor %}
+}

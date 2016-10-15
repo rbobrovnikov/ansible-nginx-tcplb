@@ -1,0 +1,8 @@
+---
+
+- name: Remove the default configuration
+  file:
+    path: "{{ nginx_tcplb_conf_dir }}/conf.d/default.conf"
+    state: absent
+  notify:
+   - restart nginx

@@ -1,0 +1,22 @@
+nginx_tcplb_group: "{{ nginx_tcplb_user }}"
+nginx_tcplb_conf_dir: "/etc/nginx"
+nginx_tcplb_worker_processes: "{% if ansible_processor_vcpus is defined %}{{ ansible_processor_vcpus }}{% else %}auto{% endif %}"
+nginx_tcplb_worker_connections: 1024
+
+nginx_tcplb_target_addr: "{% if nginx_tcplb_location == 'send' %}{{ groups['tcplb'] }}{% elif nginx_tcplb_location == 'accept' %}{{ groups['mongostat'] }}{% endif %}"
+
+nginx_tcplb_listen_addr: "{% if nginx_tcplb_location == 'send' %}{{ groups['aws-lb'] }}{% elif nginx_tcplb_location == 'accept' %}{{ groups['tcplb'] }}{% endif %}" 
+
+#### Used in tests ####
+#nginx_tcplb_group_target_lb: "{{ groups['tcplb'] }}" 
+#nginx_tcplb_group_listen_lb: "{{ groups['aws-lb'] }}" 
+#nginx_tcplb_group_target_db: "{{ groups['mongostat'] }}" 
+
+#### Used in tests ####
+#nginx_tcplb_target_addr: "{% if nginx_tcplb_location == 'send' %}{% for targetlb in nginx_tcplb_group_target_lb %}{{ targetlb }}{% endfor %}{% elif nginx_tcplb_location == 'accept' %}{% for targetdb in nginx_tcplb_group_target_db %}{{ targetdb }}{% endfor %}{% endif %}"
+#nginx_tcplb_listen_addr: "{% if nginx_tcplb_location == 'send' %}{% for listenlb in nginx_tcplb_group_listen_lb %}{{ listenlb }}{% endfor %}{% elif nginx_tcplb_location == 'accept' %}{% for targetlb in nginx_tcplb_group_target_lb %}{{ targetlb }}{% endfor %}{% endif %}"
+
+nginx_tcplb_target_port: "{% if nginx_tcplb_location == 'send' %}{{ nginx_tcplb_inet_port }}{% elif nginx_tcplb_location == 'accept' %}{{ nginx_tcplb_db_port }}{% endif %}" 
+nginx_tcplb_listen_port: "{% if nginx_tcplb_location == 'send' %}{{ nginx_tcplb_db_port }}{% elif nginx_tcplb_location == 'accept' %}{{ nginx_tcplb_inet_port }}{% endif %}" 
+
+nginx_tcplb_stream_group: mongodb_stream
